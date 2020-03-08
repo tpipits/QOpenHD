@@ -42,6 +42,10 @@ const QVector<QString> permissions({"android.permission.INTERNET",
 
 #if defined(ENABLE_VIDEO_RENDER)
 #include "openhdvideo.h"
+#if defined(__android__)
+#include "openhdandroidvideo.h"
+#include "openhdandroidrender.h"
+#endif
 #if defined(__rasp_pi__)
 #include "openhdmmalvideo.h"
 #include "openhdmmalrender.h"
@@ -136,6 +140,10 @@ int main(int argc, char *argv[]) {
     qmlRegisterType<QOpenHDLink>("OpenHD", 1,0, "QOpenHDLink");
 
 #if defined(ENABLE_VIDEO_RENDER)
+#if defined(__android__)
+    qmlRegisterType<OpenHDAndroidVideo>("OpenHD", 1, 0, "OpenHDAndroidVideo");
+    qmlRegisterType<OpenHDAndroidRender>("OpenHD", 1, 0, "OpenHDAndroidRender");
+#endif
 #if defined(__rasp_pi__)
     qmlRegisterType<OpenHDMMALVideo>("OpenHD", 1, 0, "OpenHDMMALVideo");
     qmlRegisterType<OpenHDMMALRender>("OpenHD", 1, 0, "OpenHDMMALRender");
@@ -200,6 +208,15 @@ engine.rootContext()->setContextProperty("EnableVideoRender", QVariant(false));
 #if defined(ENABLE_VIDEO_RENDER)
 engine.rootContext()->setContextProperty("EnableGStreamer", QVariant(false));
 engine.rootContext()->setContextProperty("EnableVideoRender", QVariant(true));
+
+#if defined(__android__)
+#if defined(ENABLE_MAIN_VIDEO)
+OpenHDAndroidVideo *mainVideo = new OpenHDAndroidVideo(OpenHDStreamTypeMain);
+#endif
+#if defined(ENABLE_PIP)
+OpenHDAndroidVideo *pipVideo = new OpenHDAndroidVideo(OpenHDStreamTypePiP);
+#endif
+#endif
 
 #if defined(__rasp_pi__)
 #if defined(ENABLE_MAIN_VIDEO)
@@ -341,6 +358,20 @@ OpenHDAppleVideo *pipVideo = new OpenHDAppleVideo(OpenHDStreamTypePiP);
     QThread *pipVideoThread = new QThread();
     pipVideoThread->setObjectName("pipVideoThread");
 
+
+#if defined(__android__)
+#if defined(ENABLE_MAIN_VIDEO)
+    QQuickItem *mainRenderer = rootObject->findChild<QQuickItem *>("mainAndroidSurface");
+    mainVideo->setVideoOut((OpenHDAndroidRender*)mainRenderer);
+    QObject::connect(mainVideoThread, &QThread::started, mainVideo, &OpenHDAndroidVideo::onStarted);
+#endif
+
+#if defined(ENABLE_PIP)
+    QQuickItem *pipRenderer = rootObject->findChild<QQuickItem *>("pipAndroidSurface");
+    pipVideo->setVideoOut((OpenHDAndroidRender*)pipRenderer);
+    QObject::connect(pipVideoThread, &QThread::started, pipVideo, &OpenHDAndroidVideo::onStarted);
+#endif
+#endif
 
 #if defined(__rasp_pi__)
 #if defined(ENABLE_MAIN_VIDEO)

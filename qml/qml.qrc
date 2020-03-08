@@ -89,11 +89,13 @@
         <file>ui/PresetMap.qml</file>
         <file>ui/elements/ColoredCheckboxForm.ui.qml</file>
         <file>ui/elements/ColoredCheckbox.qml</file>
+        <file>MainVideoAndroid.qml</file>
         <file>ui/FrequencyItem.qml</file>
         <file>ui/elements/StatusChart.qml</file>
         <file>ui/elements/StatusChartForm.ui.qml</file>
         <file>ui/widgets/GPIOWidget.qml</file>
         <file>ui/widgets/GPIOWidgetForm.ui.qml</file>
+        <file>ui/widgets/VideoWidgetAndroidForm.ui.qml</file>
         <file>MainVideoMMAL.qml</file>
         <file>ui/widgets/VideoWidgetMMALForm.ui.qml</file>
         <file>ic128.png</file>
