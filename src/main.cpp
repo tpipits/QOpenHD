@@ -50,6 +50,10 @@ const QVector<QString> permissions({"android.permission.INTERNET",
 #include "openhdapplevideo.h"
 #include "openhdmmalrender.h"
 #endif
+#if defined(__windows__)
+#include "openhdwindowsvideo.h"
+#include "openhdmmalrender.h"
+#endif
 #endif
 
 #include "util.h"
@@ -144,6 +148,10 @@ int main(int argc, char *argv[]) {
     qmlRegisterType<OpenHDAppleVideo>("OpenHD", 1, 0, "OpenHDAppleVideo");
     qmlRegisterType<OpenHDMMALRender>("OpenHD", 1, 0, "OpenHDMMALRender");
 #endif
+#if defined(__windows__)
+    qmlRegisterType<OpenHDWindowsVideo>("OpenHD", 1, 0, "OpenHDWindowsVideo");
+    qmlRegisterType<OpenHDMMALRender>("OpenHD", 1, 0, "OpenHDMMALRender");
+#endif
 #endif
 
     QQmlApplicationEngine engine;
@@ -219,6 +227,15 @@ OpenHDAppleVideo *pipVideo = new OpenHDAppleVideo(OpenHDStreamTypePiP);
 #endif
 #endif
 
+
+#if defined(__windows__)
+#if defined(ENABLE_MAIN_VIDEO)
+OpenHDWindowsVideo *mainVideo = new OpenHDWindowsVideo(OpenHDStreamTypeMain);
+#endif
+#if defined(ENABLE_PIP)
+OpenHDWindowsVideo *pipVideo = new OpenHDWindowsVideo(OpenHDStreamTypePiP);
+#endif
+#endif
 
 #endif
 
@@ -371,6 +388,20 @@ OpenHDAppleVideo *pipVideo = new OpenHDAppleVideo(OpenHDStreamTypePiP);
 #endif
 #endif
 
+
+#if defined(__windows__)
+#if defined(ENABLE_MAIN_VIDEO)
+    QQuickItem *mainRenderer = rootObject->findChild<QQuickItem *>("mainMMALSurface");
+    mainVideo->setVideoOut((OpenHDMMALRender*)mainRenderer);
+    QObject::connect(mainVideoThread, &QThread::started, mainVideo, &OpenHDWindowsVideo::onStarted);
+#endif
+
+#if defined(ENABLE_PIP)
+    QQuickItem *pipRenderer = rootObject->findChild<QQuickItem *>("pipMMALSurface");
+    pipVideo->setVideoOut((OpenHDMMALRender*)pipRenderer);
+    QObject::connect(pipVideoThread, &QThread::started, pipVideo, &OpenHDWindowsVideo::onStarted);
+#endif
+#endif
 
 #if defined(ENABLE_MAIN_VIDEO)
     mainVideo->moveToThread(mainVideoThread);

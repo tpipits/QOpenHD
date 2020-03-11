@@ -269,14 +269,26 @@ WindowsBuild {
     CONFIG += EnableJoysticks
     CONFIG += EnableSpeech
     CONFIG += EnableMainVideo
-    #CONFIG +- EnablePiP
+    CONFIG += EnablePiP
     CONFIG += EnableLink
-    CONFIG += EnableGStreamer
+    CONFIG += EnableRender
     #CONFIG += EnableCharts
 
-    DEFINES += GST_GL_HAVE_WINDOW_WIN32=1
-    DEFINES += GST_GL_HAVE_PLATFORM_WGL=1
-    DEFINES += HAVE_QT_WIN32
+    EnableRender {
+        QT += multimedia
+
+        HEADERS += \
+            inc/openhdwindowsvideo.h
+
+        SOURCES += \
+            src/openhdwindowsvideo.cpp
+    }
+
+    EnableGStreamer {
+        DEFINES += GST_GL_HAVE_WINDOW_WIN32=1
+        DEFINES += GST_GL_HAVE_PLATFORM_WGL=1
+        DEFINES += HAVE_QT_WIN32
+    }
 
     INCLUDEPATH += $$PWD/win/include
 }
