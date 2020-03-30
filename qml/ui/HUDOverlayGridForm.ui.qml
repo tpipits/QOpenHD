@@ -50,6 +50,10 @@ Item {
         id: flight_mode
     }
 
+    FlightDistanceWidget {
+        id: flight_distance
+    }
+
     GPSWidget {
         id: gps
     }

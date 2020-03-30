@@ -89,6 +89,8 @@ ApplicationWindow {
         property bool show_gps: true
         property double gps_opacity: 1
 
+        property bool show_flight_distance: true
+
         property bool show_home_distance: true
         property double home_distance_opacity: 1
 

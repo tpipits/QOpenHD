@@ -98,5 +98,7 @@
         <file>ui/widgets/VideoWidgetRenderForm.ui.qml</file>
         <file>ic128.png</file>
         <file>ui/elements/MapComponent.qml</file>
+        <file>ui/widgets/FlightDistanceWidgetForm.ui.qml</file>
+        <file>ui/widgets/FlightDistanceWidget.qml</file>
     </qresource>
 </RCC>

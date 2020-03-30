@@ -22,6 +22,7 @@ public:
     void telemetryMessage(QString message, int level);
     void calculate_home_distance();
     void calculate_home_course();
+    void calculate_flight_distance();
 
     void setWifiAdapters(QList<QVariantMap> adapters);
 
@@ -46,6 +47,8 @@ public:
     Q_PROPERTY(QString qt_version READ get_qt_version NOTIFY qt_version_changed)
     QString get_qt_version();
 
+    Q_PROPERTY(double flight_distance MEMBER m_flight_distance WRITE set_flight_distance NOTIFY flight_distance_changed)
+    void set_flight_distance(double flight_distance);
 
     Q_PROPERTY(double home_distance MEMBER m_home_distance WRITE set_home_distance NOTIFY home_distance_changed)
     void set_home_distance(double home_distance);
@@ -282,6 +285,7 @@ signals:
     void homelon_changed(double homelon);
     void lat_changed(double lat);
     void lon_changed(double lon);
+    void flight_distance_changed(double flight_distance);
     void home_distance_changed(double home_distance);
     void home_course_changed(double home_course);
     void battery_percent_changed(int battery_percent);
@@ -372,6 +376,11 @@ private:
     double m_homelon = 0.0;
     double m_lat = 0.0;
     double m_lon = 0.0;
+
+    double m_previous_lat = 0.0;
+    double m_previous_lon = 0.0;
+
+    double m_flight_distance = 0.0;
     double m_home_distance = 0.0;
     double m_home_course = 0.0;
     int m_battery_percent = 0;
@@ -448,6 +457,9 @@ private:
     double m_ground_vout = 0.0;
     double m_ground_vbat = 0.0;
     double m_ground_iout = 0.0;
+
+
+    qint64 flightDistanceLastTime;
 };
 
 

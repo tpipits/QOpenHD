@@ -191,6 +191,9 @@ void OpenHD::set_armed(bool armed) {
          * vehicle is disarmed, causing it to appear to stop in the UI.
          */
         flightTimeStart.start();
+
+        m_previous_lat = m_homelat;
+        m_previous_lon = m_homelon;
     }
 
     m_armed = armed;
@@ -216,6 +219,56 @@ void OpenHD::set_homelat(double homelat) {
 void OpenHD::set_homelon(double homelon) {
     m_homelon = homelon;
     emit homelon_changed(m_homelon);
+}
+
+void OpenHD::calculate_flight_distance() {
+    // if previous lat/long are zero the calculation will be wrong so we skip it
+    if (m_armed && m_previous_lat != 0.0 && m_previous_lon != 0.0) {
+        GeographicLib::Math::real s12;
+        GeographicLib::Math::real azi1;
+        GeographicLib::Math::real azi2;
+
+        GeographicLib::Geodesic geod(GeographicLib::Constants::WGS84_a(), GeographicLib::Constants::WGS84_f());
+        geod.Inverse(m_previous_lat, m_previous_lon, m_lat, m_lon, s12, azi1, azi2);
+
+        qint64 current_timestamp = QDateTime::currentMSecsSinceEpoch();
+        auto diff = current_timestamp - flightDistanceLastTime;
+
+        // only calculate every ~second
+        if (diff >= 4000) {
+            auto likelyRadius = m_speed * (diff / 1000.0);
+            flightDistanceLastTime = QDateTime::currentMSecsSinceEpoch();
+
+            qDebug() << "m_speed: " << m_speed;
+            qDebug() << "likelyRadius: " << likelyRadius;
+            qDebug() << "s12: " << s12;
+
+            if (likelyRadius > s12) {
+
+                m_previous_lat = m_lat;
+                m_previous_lon = m_lon;
+
+                qDebug("Moved %f meters", s12);
+
+                set_flight_distance(m_flight_distance + s12);
+            }
+        }
+    } else {
+        /*
+         * If the system isn't armed we don't want to calculate anything as the previous lat/lon
+         * will be wrong or zero
+         */
+        m_previous_lat = m_homelat;
+        m_previous_lon = m_homelon;
+        flightDistanceLastTime = QDateTime::currentMSecsSinceEpoch();
+        qDebug() << "Not armed or no previous position";
+        set_flight_distance(0.0);
+    }
+}
+
+void OpenHD::set_flight_distance(double flight_distance) {
+    m_flight_distance = flight_distance;
+    emit flight_distance_changed(flight_distance);
 }
 
 void OpenHD::calculate_home_distance() {

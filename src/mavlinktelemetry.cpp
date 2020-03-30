@@ -214,6 +214,7 @@ void MavlinkTelemetry::onProcessMavlinkMessage(mavlink_message_t msg) {
 
             OpenHD::instance()->calculate_home_distance();
             OpenHD::instance()->calculate_home_course();
+            OpenHD::instance()->calculate_flight_distance();
 
             break;
         }
